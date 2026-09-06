@@ -48,7 +48,7 @@ void Window::loop() {
 			if (checkError("mesh, shader upload uniforms")) errorsInLoop = true;
 
 			for (auto& [camID, meshEntries] : camMap) {
-				shaders.at(shaderID).setMat4("viewProjection", cameras.at(camID).getViewProjection());
+				shaders.at(shaderID).uploadMat4("viewProjection", cameras.at(camID).getViewProjection());
 
 				if (checkError("mesh, shader set viewProjection")) errorsInLoop = true;
 
@@ -68,7 +68,7 @@ void Window::loop() {
 			if (checkError("model, shader upload uniforms")) errorsInLoop = true;
 
 			for (auto& [camID, modelEntries] : camMap) {
-				shaders.at(shaderID).setMat4("viewProjection", cameras.at(camID).getViewProjection());
+				shaders.at(shaderID).uploadMat4("viewProjection", cameras.at(camID).getViewProjection());
 
 				if (checkError("model, shader set viewProjection")) errorsInLoop = true;
 

@@ -82,12 +82,12 @@ void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
 }
 
 void Mesh::draw(const Shader& shader) const {
-	shader.setVec3("material.color", materialColor);
-	shader.setInt("material.hasTexture", texture.has_value() ? 1 : 0);
+	shader.uploadVec3("material.color", materialColor);
+	shader.uploadInt("material.hasTexture", texture.has_value() ? 1 : 0);
 
 	if (texture) {
 		texture->bind(0);
-		shader.setInt("material.diffuse", 0);
+		shader.uploadInt("material.diffuse", 0);
 	}
 
 	glBindVertexArray(VAO);

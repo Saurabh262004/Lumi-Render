@@ -67,8 +67,6 @@ public:
 	void deactivateMat4Uniform(const std::string& id);
 	void deactivateIntUniform(const std::string& id);
 
-	void uploadUniforms();
-
 	GLuint getProgram();
 
 	~Shader();
@@ -79,17 +77,19 @@ public:
 	Shader(Shader&& other) noexcept;
 	Shader& operator=(Shader&& other) noexcept;
 
-	void setVec2(const Vec2& vec, const GLint& location) const;
-	void setVec3(const Vec3& vec, const GLint& location) const;
-	void setVec4(const Vec4& vec, const GLint& location) const;
-	void setMat4(const Mat4& mat, const GLint& location) const;
-	void setInt(int value, const GLint& location) const;
+	void uploadVec2(const Vec2& vec, const GLint& location) const;
+	void uploadVec3(const Vec3& vec, const GLint& location) const;
+	void uploadVec4(const Vec4& vec, const GLint& location) const;
+	void uploadMat4(const Mat4& mat, const GLint& location) const;
+	void uploadInt(int value, const GLint& location) const;
 
-	void setVec2(const std::string& name, const Vec2& vec) const;
-	void setVec3(const std::string& name, const Vec3& vec) const;
-	void setVec4(const std::string& name, const Vec4& vec) const;
-	void setMat4(const std::string& name, const Mat4& mat) const;
-	void setInt(const std::string& name, int value) const;
+	void uploadVec2(const std::string& name, const Vec2& vec) const;
+	void uploadVec3(const std::string& name, const Vec3& vec) const;
+	void uploadVec4(const std::string& name, const Vec4& vec) const;
+	void uploadMat4(const std::string& name, const Mat4& mat) const;
+	void uploadInt(const std::string& name, int value) const;
+	
+	void uploadUniforms();
 
 	void use() const;
 
