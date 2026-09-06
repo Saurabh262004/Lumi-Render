@@ -87,7 +87,8 @@ public:
 	CameraController* getCameraController(const std::string& camID); // nullptr if no controller is set
 
 	bool hasShader(const std::string& id) const;
-	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
+	void addShaderFromFiles(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
+	void addShaderFromSource(std::string id, const std::string& vertexSource, const std::string& fragmentSource);
 
 	bool isKeyDown(Key key) const;
 	Vec2 getMouseDelta() const;

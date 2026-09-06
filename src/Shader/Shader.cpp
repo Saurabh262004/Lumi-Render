@@ -6,17 +6,26 @@
 #include <lumi_render/Shader.hpp>
 #include <lumi_render/Util.hpp>
 
-Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
-	GLint success;
+Shader Shader::fromSource(const std::string& vertexSource, const std::string& fragmentSource) {
+	return Shader(vertexSource, fragmentSource);
+}
 
+Shader Shader::fromFiles(const std::string& vertexPath, const std::string& fragmentPath) {
 	std::string vertexCode = Util::readFile(vertexPath);
 	const char* vertexSource = vertexCode.c_str();
 
 	std::string fragmentCode = Util::readFile(fragmentPath);
 	const char* fragmentSource = fragmentCode.c_str();
 
+	return Shader(vertexSource, fragmentSource);
+}
+
+Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource) {
+	GLint success;
+
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexSource, nullptr);
+	const char* vertexSourceCStr = vertexSource.c_str();
+	glShaderSource(vertexShader, 1, &vertexSourceCStr, nullptr);
 
 	glCompileShader(vertexShader);
 
@@ -34,7 +43,8 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	}
 
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentSource, nullptr);
+	const char* fragmentSourceCStr = fragmentSource.c_str();
+	glShaderSource(fragmentShader, 1, &fragmentSourceCStr, nullptr);
 
 	glCompileShader(fragmentShader);
 

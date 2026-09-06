@@ -35,7 +35,8 @@ struct IntUniformEntry {
 
 class Shader {
 public:
-	Shader(const std::string& vertexPath, const std::string& fragmentPath);
+	static Shader fromSource(const std::string& vertexSource, const std::string& fragmentSource);
+	static Shader fromFiles(const std::string& vertexPath, const std::string& fragmentPath);
 
 	void addVec2Uniform(const std::string& id, const Vec2& vec);
 	void addVec3Uniform(const std::string& id, const Vec3& vec);
@@ -94,6 +95,8 @@ public:
 	void use() const;
 
 private:
+	Shader(const std::string& vertexSource, const std::string& fragmentSource);
+
 	GLuint program{};
 
 	std::unordered_map<std::string, Vec2UniformEntry> vec2Uniforms;

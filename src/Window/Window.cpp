@@ -130,11 +130,17 @@ bool Window::isCursorCaptured() const {
 	return glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
 }
 
-void Window::addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath) {
+void Window::addShaderFromFiles(std::string id, const std::string& vertexPath, const std::string& fragmentPath) {
 	shaders.try_emplace(
 		std::move(id),
-		vertexPath,
-		fragmentPath
+		Shader::fromFiles(vertexPath, fragmentPath)
+	);
+}
+
+void Window::addShaderFromSource(std::string id, const std::string& vertexSource, const std::string& fragmentSource) {
+	shaders.try_emplace(
+		std::move(id),
+		Shader::fromSource(vertexSource, fragmentSource)
 	);
 }
 

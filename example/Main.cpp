@@ -88,7 +88,7 @@ int main() {
 	cam2D->setViewportResolution((float)1280, (float)720);
 	cam2D->setPosition({0.0f, 0.0f, 1.0f});
 
-	window.addShader("shader1", "assets/shaders/shader.vert", "assets/shaders/shader.frag");
+	window.addShaderFromFiles("shader1", "assets/shaders/shader.vert", "assets/shaders/shader.frag");
 	Shader* shader1 = window.getShader("shader1");
 	shader1->addVec3Uniform("lightDir", Vec3{-0.5f, -1.0f, -0.3f});
 	shader1->activateVec3Uniform("lightDir");
