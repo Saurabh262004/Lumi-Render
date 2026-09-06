@@ -1,4 +1,4 @@
-# LumiCore
+# Lumi-Render
 
 A custom purpose, lightweight C++ OpenGL renderer
 
