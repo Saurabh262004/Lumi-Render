@@ -89,7 +89,7 @@ public:
 	void uploadVec4(const std::string& name, const Vec4& vec) const;
 	void uploadMat4(const std::string& name, const Mat4& mat) const;
 	void uploadInt(const std::string& name, int value) const;
-	
+
 	void uploadUniforms();
 
 	void use() const;
