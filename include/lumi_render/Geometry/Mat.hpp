@@ -123,11 +123,11 @@ struct Mat4 {
 
 		float f = 1.0f / std::tan(fovRadians / 2.0f);
 
-		result.m[0]  = f / aspect;							// col 0, row 0
-		result.m[5]  = f;									// col 1, row 1
-		result.m[10] = (far + near) / (near - far);			// col 2, row 2
-		result.m[11] = -1.0f;								// col 2, row 3
-		result.m[14] = (2 * far * near) / (near - far);		// col 3, row 2
+		result.m[0]  = f / aspect;                          // col 0, row 0
+		result.m[5]  = f;                                   // col 1, row 1
+		result.m[10] = (far + near) / (near - far);         // col 2, row 2
+		result.m[11] = -1.0f;                               // col 2, row 3
+		result.m[14] = (2 * far * near) / (near - far);     // col 3, row 2
 
 		return result;
 	}
