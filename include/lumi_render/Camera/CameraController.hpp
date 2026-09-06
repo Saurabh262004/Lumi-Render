@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lumi/Camera/Camera.hpp>
+#include <lumi_render/Camera/Camera.hpp>
 
 class Window; // forward declaration to avoid circular include with Window.hpp
 

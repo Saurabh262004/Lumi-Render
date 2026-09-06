@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <glad/glad.h>
 
-#include <lumi/Geometry/Vec.hpp>
-#include <lumi/Geometry/Mat.hpp>
+#include <lumi_render/Geometry/Vec.hpp>
+#include <lumi_render/Geometry/Mat.hpp>
 
 struct Vec2UniformEntry {
 	Vec2 vec;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <lumi/Geometry/Vec.hpp>
-#include <lumi/Geometry/Mat.hpp>
+#include <lumi_render/Geometry/Vec.hpp>
+#include <lumi_render/Geometry/Mat.hpp>
 
 class Camera {
 private:

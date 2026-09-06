@@ -7,11 +7,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <lumi/Geometry/Vec.hpp>
-#include <lumi/Geometry/Mat.hpp>
-#include <lumi/Geometry/Vertex.hpp>
-#include <lumi/Shader.hpp>
-#include <lumi/Texture.hpp>
+#include <lumi_render/Geometry/Vec.hpp>
+#include <lumi_render/Geometry/Mat.hpp>
+#include <lumi_render/Geometry/Vertex.hpp>
+#include <lumi_render/Shader.hpp>
+#include <lumi_render/Texture.hpp>
 
 struct InstanceData {
 	Mat4 model; // position + rotation + scale

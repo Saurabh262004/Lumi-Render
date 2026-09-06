@@ -7,12 +7,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <lumi/Shader.hpp>
-#include <lumi/Geometry/Mesh.hpp>
-#include <lumi/Geometry/Model.hpp>
-#include <lumi/Camera/Camera.hpp>
-#include <lumi/Camera/CameraController.hpp>
-#include <lumi/Key.hpp>
+#include <lumi_render/Shader.hpp>
+#include <lumi_render/Geometry/Mesh.hpp>
+#include <lumi_render/Geometry/Model.hpp>
+#include <lumi_render/Camera/Camera.hpp>
+#include <lumi_render/Camera/CameraController.hpp>
+#include <lumi_render/Key.hpp>
 
 // Window events
 using LumiWindowposfun          = void(*)(Window* window, int x, int y);                                // Window moved

@@ -2,8 +2,8 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <lumi/Geometry/Mesh.hpp>
-#include <lumi/Shader.hpp>
+#include <lumi_render/Geometry/Mesh.hpp>
+#include <lumi_render/Shader.hpp>
 
 struct aiNode;
 struct aiScene;

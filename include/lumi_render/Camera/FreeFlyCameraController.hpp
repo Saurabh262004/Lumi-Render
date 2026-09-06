@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lumi/Camera/CameraController.hpp>
+#include <lumi_render/Camera/CameraController.hpp>
 
 class FreeFlyCameraController : public CameraController {
 public:
