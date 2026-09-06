@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include <lumi/Shader.hpp>
+#include <lumi_render/Shader.hpp>
 
 // Check if uniforms exist
 

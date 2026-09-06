@@ -1,6 +1,6 @@
-#include <lumi/Camera/FreeFlyCameraController.hpp>
-#include <lumi/Window.hpp>
-#include <lumi/Key.hpp>
+#include <lumi_render/Camera/FreeFlyCameraController.hpp>
+#include <lumi_render/Window.hpp>
+#include <lumi_render/Key.hpp>
 
 FreeFlyCameraController::FreeFlyCameraController(float moveSpeed, float mouseSensitivity) : moveSpeed{moveSpeed}, mouseSensitivity{mouseSensitivity} {}
 

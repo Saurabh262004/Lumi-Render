@@ -9,6 +9,14 @@ find_package(glfw3 REQUIRED)
 find_package(assimp REQUIRED)
 find_package(OpenGL REQUIRED)
 
+# Detect whether Lumi-render is the top-level project, or is being pulled in
+# as a dependency by another repo.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+	set(LUMI_IS_TOP_LEVEL TRUE)
+else()
+	set(LUMI_IS_TOP_LEVEL FALSE)
+endif()
+
 # Library
 
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
@@ -17,35 +25,40 @@ file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
 	"external/glad/glad.c"
 )
 
-add_library(lumi STATIC ${LIB_SOURCES})
+add_library(lumi_render STATIC ${LIB_SOURCES})
 
-target_include_directories(lumi
+target_include_directories(lumi_render
 	PUBLIC
 		include
 		external
 )
 
-target_link_libraries(lumi
+target_link_libraries(lumi_render
 	PUBLIC
 		glfw
 		OpenGL::GL
 		assimp
 )
 
-target_compile_options(lumi PRIVATE
+target_compile_options(lumi_render PRIVATE
 	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra>
 )
 
 # Example application
+# Only built when Lumi-render is the top-level project
 
-add_executable(app
-	example/Main.cpp
-)
+option(LUMI_BUILD_EXAMPLE "Build example app" ${LUMI_IS_TOP_LEVEL})
 
-target_link_libraries(app
-	PRIVATE
-		lumi
-)
+if(LUMI_BUILD_EXAMPLE)
+	add_executable(app
+		example/Main.cpp
+	)
+
+	target_link_libraries(app
+		PRIVATE
+			lumi_render
+	)
+endif()
 
 # Test application (uses local testAssets/, off by default)
 
@@ -58,6 +71,6 @@ if(LUMI_BUILD_TESTAPP)
 
 	target_link_libraries(testApp
 		PRIVATE
-			lumi
+			lumi_render
 	)
 endif()

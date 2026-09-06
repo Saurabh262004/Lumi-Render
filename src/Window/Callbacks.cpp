@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <lumi/Util.hpp>
-#include <lumi/Window.hpp>
+#include <lumi_render/Util.hpp>
+#include <lumi_render/Window.hpp>
 
 void Window::setInternalCallbacks() {
 	glfwSetWindowPosCallback(window, staticWindowPosCallback);

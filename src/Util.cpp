@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include <lumi/Util.hpp>
+#include <lumi_render/Util.hpp>
 
 std::string Util::readFile(const std::string& path) {
 	std::ifstream file(path);

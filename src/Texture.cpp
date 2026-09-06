@@ -6,7 +6,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-#include <lumi/Texture.hpp>
+#include <lumi_render/Texture.hpp>
 
 Texture::Texture(const std::string& path, bool flipVertically) {
 	stbi_set_flip_vertically_on_load(flipVertically);

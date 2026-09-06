@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include <lumi/Shader.hpp>
-#include <lumi/Util.hpp>
+#include <lumi_render/Shader.hpp>
+#include <lumi_render/Util.hpp>
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	GLint success;

@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include <lumi/Window.hpp>
+#include <lumi_render/Window.hpp>
 
 bool Window::hasCamera(const std::string& id) const {
 	return cameras.find(id) != cameras.end();

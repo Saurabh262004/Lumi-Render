@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <lumi/Window.hpp>
+#include <lumi_render/Window.hpp>
 
 int Window::windowCount = 0;
 

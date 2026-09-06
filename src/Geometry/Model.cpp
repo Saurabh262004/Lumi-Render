@@ -9,10 +9,10 @@
 #include <assimp/material.h>
 #include <assimp/texture.h>
 
-#include <lumi/Geometry/Vec.hpp>
-#include <lumi/Geometry/Model.hpp>
-#include <lumi/Geometry/Vertex.hpp>
-#include <lumi/Texture.hpp>
+#include <lumi_render/Geometry/Vec.hpp>
+#include <lumi_render/Geometry/Model.hpp>
+#include <lumi_render/Geometry/Vertex.hpp>
+#include <lumi_render/Texture.hpp>
 
 Model::Model(const std::string& path, bool normalizeToUnitCube) {
 	Assimp::Importer importer;

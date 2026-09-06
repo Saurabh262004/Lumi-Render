@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include <lumi/Shader.hpp>
-#include <lumi/Camera/Camera.hpp>
-#include <lumi/Camera/FreeFlyCameraController.hpp>
-#include <lumi/Geometry/Model.hpp>
-#include <lumi/Window.hpp>
+#include <lumi_render/Shader.hpp>
+#include <lumi_render/Camera/Camera.hpp>
+#include <lumi_render/Camera/FreeFlyCameraController.hpp>
+#include <lumi_render/Geometry/Model.hpp>
+#include <lumi_render/Window.hpp>
 
 void keyCallback(Window* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
