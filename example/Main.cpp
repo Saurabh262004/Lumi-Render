@@ -104,7 +104,7 @@ int main() {
 
 	window.addMesh(makeTestQuad(), "shader1", "2DCam", "testQuad");
 	Mesh* testQuad = window.getMesh("shader1", "2DCam", "testQuad");
-	//testQuad->setTexture(Texture("assets/textures/checker.png"));
+	testQuad->setTexture(Texture("assets/textures/checker.png"));
 	testQuad->addInstance({ Mat4::translate({-540.0f, 260.0f, 0.0f}) * Mat4::rotateX(0) * Mat4::scale({200.0f, 200.0f, 1.0f}), {1.0f, 1.0f, 1.0f} });
 	testQuad->uploadInstances();
 
