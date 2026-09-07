@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(GLib LANGUAGES C CXX)
+project(lumi_render LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

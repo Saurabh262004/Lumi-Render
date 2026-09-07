@@ -5,13 +5,16 @@
 
 void Window::loop() {
 	bool errorsInLoop = false;
-	
+
 	double lastTime = glfwGetTime();
 
 	active = true;
 	while (active && !glfwWindowShouldClose(window) && !errorsInLoop) {
+		if (lumiPreLoop) { lumiPreLoop(this); }
+
 		double currentTime = glfwGetTime();
 		float deltaTime = static_cast<float>(currentTime - lastTime);
+		fps = 1.0f / deltaTime;
 		lastTime = currentTime;
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -82,5 +85,7 @@ void Window::loop() {
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		if (lumiPostLoop) { lumiPostLoop(this); }
 	}
 }

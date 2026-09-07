@@ -38,6 +38,9 @@ using LumiScrollfun             = void(*)(Window* window, double dX, double dY);
 // File events
 using LumiDropfun               = void(*)(Window* window, int pathCount, const char** paths);           // Files dropped onto window
 
+// custom window loop callback
+using LumiLoop               = void(*)(Window* window);                                                 // runs in the main loop
+
 struct MeshEntry {
 	std::string id;
 	Mesh mesh;
@@ -71,6 +74,7 @@ public:
 
 	int getWidth() { return width; }
 	int getHeight() { return height; }
+	float getFps() const { return fps; }
 	bool getFullscreen() { return fullscreen; }
 
 	Shader* getShader(const std::string id);
@@ -91,7 +95,7 @@ public:
 	void addShaderFromSource(std::string id, const std::string& vertexSource, const std::string& fragmentSource);
 
 	bool isKeyDown(Key key) const;
-	Vec2 getMouseDelta() const;
+	Vec2 getMouseDelta() const { return mouseDelta; }
 	void setCursorCaptured(bool captured);
 	bool isCursorCaptured() const;
 
@@ -116,6 +120,9 @@ public:
 	void setScrollCallback(LumiScrollfun callback);
 	void setDropCallback(LumiDropfun callback);
 
+	void setLumiPreLoop(LumiLoop callback);
+	void setLumiPostLoop(LumiLoop callback);
+
 	void close();
 
 	void loop();
@@ -128,6 +135,7 @@ private:
 	int width{};
 	int height{};
 	bool fullscreen{};
+	float fps{};
 	bool active = false;
 
 	std::unordered_map<std::string, Camera> cameras;
@@ -200,4 +208,7 @@ private:
 	LumiMousebuttonfun customMouseButtonCallback = nullptr;
 	LumiScrollfun customScrollCallback = nullptr;
 	LumiDropfun customDropCallback = nullptr;
+
+	LumiLoop lumiPreLoop = nullptr;
+	LumiLoop lumiPostLoop = nullptr;
 };

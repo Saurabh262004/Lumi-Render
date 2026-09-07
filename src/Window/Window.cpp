@@ -118,10 +118,6 @@ bool Window::isKeyDown(Key key) const {
 	return glfwGetKey(window, static_cast<int>(key)) == GLFW_PRESS;
 }
 
-Vec2 Window::getMouseDelta() const {
-	return mouseDelta;
-}
-
 void Window::setCursorCaptured(bool captured) {
 	glfwSetInputMode(window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }

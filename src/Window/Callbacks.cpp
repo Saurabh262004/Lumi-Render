@@ -312,3 +312,11 @@ void Window::setScrollCallback(LumiScrollfun callback) {
 void Window::setDropCallback(LumiDropfun callback) {
 	customDropCallback = callback;
 }
+
+void Window::setLumiPreLoop(LumiLoop callback) {
+	lumiPreLoop = callback;
+}
+
+void Window::setLumiPostLoop(LumiLoop callback) {
+	lumiPostLoop = callback;
+}
