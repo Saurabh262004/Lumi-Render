@@ -77,6 +77,13 @@ public:
 	float getFps() const { return fps; }
 	bool getFullscreen() { return fullscreen; }
 
+	bool getClearColorBufferActive() { return clearColorBuffer; }
+	void setClearColorBufferActive(bool value) { clearColorBuffer = value; }
+	bool getClearDepthBufferActive() { return clearDepthBuffer; }
+	void setClearDepthBufferActive(bool value) { clearDepthBuffer = value; }
+	Vec4 getClearColor() { return clearColor; }
+	void setClearColor(Vec4 vec) { clearColor = vec; }
+
 	Shader* getShader(const std::string id);
 	Camera* getCamera(const std::string id);
 
@@ -137,6 +144,10 @@ private:
 	bool fullscreen{};
 	float fps{};
 	bool active = false;
+
+	bool clearColorBuffer = true;
+	bool clearDepthBuffer = true;
+	Vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
 	std::unordered_map<std::string, Camera> cameras;
 	std::unordered_map<std::string, Shader> shaders;

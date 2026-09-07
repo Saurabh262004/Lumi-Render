@@ -10,15 +10,29 @@ void Window::loop() {
 
 	active = true;
 	while (active && !glfwWindowShouldClose(window) && !errorsInLoop) {
-		if (lumiPreLoop) { lumiPreLoop(this); }
+		if (lumiPreLoop) lumiPreLoop(this);
 
 		double currentTime = glfwGetTime();
 		float deltaTime = static_cast<float>(currentTime - lastTime);
 		fps = 1.0f / deltaTime;
 		lastTime = currentTime;
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if (clearColorBuffer || clearDepthBuffer) {
+			GLbitfield clearMask = 0;
+
+			if (clearColorBuffer) clearMask |= GL_COLOR_BUFFER_BIT;
+
+			if (clearDepthBuffer) clearMask |= GL_DEPTH_BUFFER_BIT;
+
+			glClearColor(
+				clearColor.x,
+				clearColor.y,
+				clearColor.z,
+				clearColor.w
+			);
+
+			glClear(clearMask);
+		}
 
 		double currentMouseX, currentMouseY;
 		glfwGetCursorPos(window, &currentMouseX, &currentMouseY);
@@ -86,6 +100,6 @@ void Window::loop() {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		if (lumiPostLoop) { lumiPostLoop(this); }
+		if (lumiPostLoop) lumiPostLoop(this);
 	}
 }
