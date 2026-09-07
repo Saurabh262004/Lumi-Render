@@ -117,6 +117,14 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			};
 		}
 
+		if (mesh->HasVertexColors(0)) {
+			v.color = {
+				mesh->mColors[0][i].r,
+				mesh->mColors[0][i].g,
+				mesh->mColors[0][i].b
+			};
+		}
+
 		vertices.push_back(v);
 	}
 
