@@ -57,6 +57,18 @@ private:
 	std::string directory;
 	float importScale{1.0f};
 
+	Vec4 computeTangent(aiMesh* mesh, unsigned i, const Vec3& normal) const;
+
+	std::vector<Vertex> extractVertices(aiMesh* mesh) const;
+	std::vector<std::uint32_t> extractIndices(aiMesh* mesh) const;
+	Vertex extractVertex(aiMesh* mesh, unsigned i) const;
+
+	void loadMaterialColor(Mesh& result, aiMaterial* material);
+	void loadEmbeddedTexture(Mesh& result, const aiScene* scene, const std::string& pathStr);
+	void loadExternalTexture(Mesh& result, std::string pathStr);
+	void loadMaterial(Mesh& result, const aiScene* scene, unsigned materialIndex);
+	void loadMaterialTexture(Mesh& result, const aiScene* scene, aiMaterial* material);
+
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 };

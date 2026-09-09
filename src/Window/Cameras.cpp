@@ -1,5 +1,4 @@
 #include <stdexcept>
-#include <algorithm>
 
 #include <lumi_render/Window.hpp>
 
@@ -9,13 +8,13 @@ bool Window::hasCamera(const std::string& id) const {
 
 Camera* Window::getCamera(const std::string id) { return &cameras.at(id); }
 
+void Window::addCamera(std::string id) {
+	cameras.insert_or_assign(std::move(id), Camera());
+}
+
 CameraController* Window::getCameraController(const std::string& camID) {
 	auto it = cameraControllers.find(camID);
 	return (it != cameraControllers.end()) ? it->second.get() : nullptr;
-}
-
-void Window::addCamera(std::string id) {
-	cameras.insert_or_assign(std::move(id), Camera());
 }
 
 void Window::setCameraController(const std::string& camID, std::unique_ptr<CameraController> controller) {

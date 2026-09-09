@@ -320,3 +320,17 @@ void Window::setLumiPreLoop(LumiLoop callback) {
 void Window::setLumiPostLoop(LumiLoop callback) {
 	lumiPostLoop = callback;
 }
+
+// other
+
+bool Window::isKeyDown(Key key) const {
+	return glfwGetKey(window, static_cast<int>(key)) == GLFW_PRESS;
+}
+
+void Window::setCursorCaptured(bool captured) {
+	glfwSetInputMode(window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+}
+
+bool Window::isCursorCaptured() const {
+	return glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
+}
