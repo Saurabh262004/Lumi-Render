@@ -9,7 +9,7 @@ A custom purpose, lightweight C++ OpenGL renderer
 ### Vertex Attributes
 
 | Location | Attribute | Type   |
-|---------:|-----------|--------|
+|:--------:|-----------|--------|
 | 0        | position  | `vec3` |
 | 1        | normal    | `vec3` |
 | 2        | tangent   | `vec4` |
@@ -19,7 +19,7 @@ A custom purpose, lightweight C++ OpenGL renderer
 ### Instance Attributes
 
 | Location | Attribute | Type   |
-|---------:|-----------|--------|
+|:--------:|-----------|--------|
 | 5–8      | model     | `mat4` |
 | 9        | color     | `vec3` |
 
