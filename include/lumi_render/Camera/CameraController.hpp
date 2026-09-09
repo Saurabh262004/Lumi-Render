@@ -2,7 +2,7 @@
 
 #include <lumi_render/Camera/Camera.hpp>
 
-class Window; // forward declaration to avoid circular include with Window.hpp
+class Window;
 
 class CameraController {
 public:
