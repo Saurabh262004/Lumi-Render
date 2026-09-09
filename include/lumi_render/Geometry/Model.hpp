@@ -1,4 +1,3 @@
-// Model.hpp
 #pragma once
 #include <string>
 #include <vector>
@@ -8,6 +7,7 @@
 struct aiNode;
 struct aiScene;
 struct aiMesh;
+struct aiMaterial;
 
 class Model {
 public:
