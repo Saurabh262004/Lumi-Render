@@ -56,7 +56,7 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count, GLenum u
 	GLuint colorLoc = instanceBaseLocation + 4;
 
 	glVertexAttribPointer(
-		colorLoc, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
+		colorLoc, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
 		(void*)offsetof(InstanceData, color)
 	);
 
@@ -70,7 +70,7 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count, GLenum u
 }
 
 void Mesh::addNormalInstance() {
-	InstanceData instance = { Mat4::identity(), {1, 1, 1} };
+	InstanceData instance = { Mat4::identity(), {1, 1, 1, 1} };
 
 	addInstance(instance);
 }
@@ -82,7 +82,7 @@ void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
 }
 
 void Mesh::draw(const Shader& shader) const {
-	shader.uploadVec3("material.color", materialColor);
+	shader.uploadVec4("material.color", materialColor);
 	shader.uploadInt("material.hasTexture", texture.has_value() ? 1 : 0);
 
 	if (texture) {

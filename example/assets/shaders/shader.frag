@@ -1,11 +1,11 @@
 #version 460 core
 
-in vec3 vColor;
+in vec4 vColor;
 in vec3 vNormal;
 in vec2 vTexCoord;
 
 struct Material {
-	vec3 color;
+	vec4 color;
 	sampler2D diffuse;
 	int hasTexture;
 };
@@ -16,10 +16,10 @@ uniform vec3 lightDir;
 out vec4 FragColor;
 
 void main() {
-	vec3 albedo = vColor * material.color;
+	vec4 albedo = vColor * material.color;
 
 	if (material.hasTexture == 1) {
-		albedo *= texture(material.diffuse, vTexCoord).rgb;
+		albedo *= texture(material.diffuse, vTexCoord);
 	}
 
 	vec3 N = normalize(vNormal);
@@ -27,7 +27,7 @@ void main() {
 	float diff = max(dot(N, -lightDir), 0.0);
 
 	float ambient = 0.15;
-	vec3 result = albedo * (ambient + diff * (1.0 - ambient));
+	vec3 result = albedo.rgb * (ambient + diff * (1.0 - ambient));
 
-	FragColor = vec4(result, 1.0);
+	FragColor = vec4(result, albedo.a);
 }

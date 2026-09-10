@@ -13,7 +13,7 @@ A custom purpose, lightweight C++ OpenGL renderer
 | 0        | position  | `vec3` |
 | 1        | normal    | `vec3` |
 | 2        | tangent   | `vec4` |
-| 3        | color     | `vec3` |
+| 3        | color     | `vec4` |
 | 4        | texCoord  | `vec2` |
 
 ### Instance Attributes
@@ -21,7 +21,7 @@ A custom purpose, lightweight C++ OpenGL renderer
 | Location | Attribute | Type   |
 |:--------:|-----------|--------|
 | 5–8      | model     | `mat4` |
-| 9        | color     | `vec3` |
+| 9        | color     | `vec4` |
 
 ### Uniforms
 

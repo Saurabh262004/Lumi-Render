@@ -35,28 +35,28 @@ Mesh makeTestQuad() {
 			{ -0.5f, -0.5f,  0.0f        }, // position
 			{  0.0f,  0.0f,  1.0f        }, // normal
 			{  1.0f,  0.0f,  0.0f,  1.0f }, // tangent
-			{  1.0f,  1.0f,  1.0f        }, // color
+			{  1.0f,  1.0f,  1.0f,  1.0f }, // color
 			{  0.0f,  0.0f               }  // texCoord
 		},
 		{
 			{  0.5f, -0.5f,  0.0f        },
 			{  0.0f,  0.0f,  1.0f        },
 			{  1.0f,  0.0f,  0.0f,  1.0f },
-			{  1.0f,  1.0f,  1.0f        },
+			{  1.0f,  1.0f,  1.0f,  1.0f },
 			{  1.0f,  0.0f               }
 		},
 		{
 			{  0.5f,  0.5f,  0.0f        },
 			{  0.0f,  0.0f,  1.0f        },
 			{  1.0f,  0.0f,  0.0f,  1.0f },
-			{  1.0f,  1.0f,  1.0f        },
+			{  1.0f,  1.0f,  1.0f,  1.0f },
 			{  1.0f,  1.0f               }
 		},
 		{
 			{ -0.5f,  0.5f,  0.0f        },
 			{  0.0f,  0.0f,  1.0f        },
 			{  1.0f,  0.0f,  0.0f,  1.0f },
-			{  1.0f,  1.0f,  1.0f        },
+			{  1.0f,  1.0f,  1.0f,  1.0f },
 			{  0.0f,  1.0f               }
 		},
 	};
@@ -99,13 +99,13 @@ int main() {
 
 	window.addModel("shader1", "3DCam", "model1", "assets/models/pyramid/obj");
 	Model* model1 = window.getModel("shader1", "3DCam", "model1");
-	model1->addInstance({Mat4::translate({0.0f, 1.0f, 0.0f}), {0.7f, 0.0f, 0.5f}});
+	model1->addInstance({Mat4::translate({0.0f, 1.0f, 0.0f}), {0.7f, 0.0f, 0.5f, 1.0f}});
 	model1->uploadInstances();
 
 	window.addMesh(makeTestQuad(), "shader1", "2DCam", "testQuad");
 	Mesh* testQuad = window.getMesh("shader1", "2DCam", "testQuad");
 	testQuad->setTexture(Texture("assets/textures/checker.png"));
-	testQuad->addInstance({ Mat4::translate({-540.0f, 260.0f, 0.0f}) * Mat4::rotateX(0) * Mat4::scale({200.0f, 200.0f, 1.0f}), {1.0f, 1.0f, 1.0f} });
+	testQuad->addInstance({ Mat4::translate({-540.0f, 260.0f, 0.0f}) * Mat4::rotateX(0) * Mat4::scale({200.0f, 200.0f, 1.0f}), {1.0f, 1.0f, 1.0f, 1.0f} });
 	testQuad->uploadInstances();
 
 	window.setKeyCallback(keyCallback);

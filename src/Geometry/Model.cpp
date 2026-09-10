@@ -77,7 +77,7 @@ void Model::loadMaterialColor(Mesh& result, aiMaterial* material) {
 	aiColor4D diffuseColor{1.0f, 1.0f, 1.0f, 1.0f};
 
 	if (aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuseColor) == AI_SUCCESS) {
-		result.setMaterialColor({ diffuseColor.r, diffuseColor.g, diffuseColor.b });
+		result.setMaterialColor({ diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a });
 	}
 }
 
@@ -142,7 +142,7 @@ Vertex Model::extractVertex(aiMesh* mesh, unsigned i) const {
 
 	if (mesh->HasTangentsAndBitangents()) v.tangent = computeTangent(mesh, i, v.normal);
 
-	if (mesh->HasVertexColors(0)) v.color = { mesh->mColors[0][i].r, mesh->mColors[0][i].g, mesh->mColors[0][i].b };
+	if (mesh->HasVertexColors(0)) v.color = { mesh->mColors[0][i].r, mesh->mColors[0][i].g, mesh->mColors[0][i].b, mesh->mColors[0][i].a };
 
 	return v;
 }

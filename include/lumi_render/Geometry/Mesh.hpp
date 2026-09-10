@@ -15,7 +15,7 @@
 
 struct InstanceData {
 	Mat4 model; // position + rotation + scale
-	Vec3 color;
+	Vec4 color;
 };
 
 class Mesh {
@@ -33,7 +33,7 @@ public:
 	void setInstanceData(const InstanceData* data, std::size_t count, GLenum usage = GL_STATIC_DRAW);
 	void updateInstanceData(const InstanceData* data, std::size_t count);
 
-	void setMaterialColor(const Vec3& color) { materialColor = color; }
+	void setMaterialColor(const Vec4& color) { materialColor = color; }
 	void setTexture(Texture&& tex) { texture = std::move(tex); }
 
 	void draw(const Shader& shader) const;
@@ -54,6 +54,6 @@ private:
 	std::size_t instanceCount{0};
 	std::vector<InstanceData> instanceBuffer;
 
-	Vec3 materialColor{1.0f, 1.0f, 1.0f};
+	Vec4 materialColor{1.0f, 1.0f, 1.0f, 1.0f};
 	std::optional<Texture> texture;
 };

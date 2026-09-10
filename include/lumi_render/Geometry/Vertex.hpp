@@ -22,7 +22,7 @@ struct Vertex {
 	Vec3 position;
 	Vec3 normal;
 	Vec4 tangent;
-	Vec3 color{1.0f, 1.0f, 1.0f};
+	Vec4 color{1.0f, 1.0f, 1.0f, 1.0f};
 	Vec2 texCoord{0.0f, 0.0f};
 
 	static VertexLayout layout() {
@@ -32,7 +32,7 @@ struct Vertex {
 				{ 0, 3, offsetof(Vertex, position) },
 				{ 1, 3, offsetof(Vertex, normal)   },
 				{ 2, 4, offsetof(Vertex, tangent)  },
-				{ 3, 3, offsetof(Vertex, color)    },
+				{ 3, 4, offsetof(Vertex, color)    },
 				{ 4, 2, offsetof(Vertex, texCoord) },
 			}
 		};
