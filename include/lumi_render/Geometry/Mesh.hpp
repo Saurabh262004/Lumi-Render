@@ -36,6 +36,9 @@ public:
 	void setMaterialColor(const Vec4& color) { materialColor = color; }
 	void setTexture(Texture&& tex) { texture = std::move(tex); }
 
+	void setTransparent(bool value) { transparent = value; }
+	bool isTransparent() const { return transparent; }
+
 	void draw(const Shader& shader) const;
 
 	Mesh(const Mesh&) = delete;
@@ -56,4 +59,6 @@ private:
 
 	Vec4 materialColor{1.0f, 1.0f, 1.0f, 1.0f};
 	std::optional<Texture> texture;
+
+	bool transparent{false};
 };

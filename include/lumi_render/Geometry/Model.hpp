@@ -39,8 +39,12 @@ public:
 		for (auto& mesh : meshes) mesh.setInstanceData(data, count, usage);
 	}
 
-	void draw(const Shader& shader) const {
-		for (const auto& mesh : meshes) mesh.draw(shader);
+	void drawOpaque(const Shader& shader) const {
+		for (const auto& mesh : meshes) if (!mesh.isTransparent()) mesh.draw(shader);
+	}
+
+	void drawTransparent(const Shader& shader) const {
+		for (const auto& mesh : meshes) if (mesh.isTransparent()) mesh.draw(shader);
 	}
 
 	void updateInstanceData(const InstanceData* data, std::size_t count) {

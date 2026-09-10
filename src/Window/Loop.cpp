@@ -55,6 +55,9 @@ void Window::loop() {
 			camera.updateViewProjection();
 		}
 
+		// TEMPORARY FIX
+
+		// opaque meshes
 		for (auto& [shaderID, camMap] : meshes) {
 			shaders.at(shaderID).use();
 
@@ -69,12 +72,15 @@ void Window::loop() {
 
 				if (checkError("mesh, shader set viewProjection")) errorsInLoop = true;
 
-				for (auto& meshEntry : meshEntries) meshEntry.mesh.draw(shaders.at(shaderID));
+				for (auto& meshEntry : meshEntries) {
+					if (!meshEntry.mesh.isTransparent()) meshEntry.mesh.draw(shaders.at(shaderID));
+				}
 
 				if (checkError("mesh, draw")) errorsInLoop = true;
 			}
 		}
 
+		// opaque model meshes
 		for (auto& [shaderID, camMap] : models) {
 			shaders.at(shaderID).use();
 
@@ -89,7 +95,51 @@ void Window::loop() {
 
 				if (checkError("model, shader set viewProjection")) errorsInLoop = true;
 
-				for (auto& modelEntry : modelEntries) modelEntry.model.draw(shaders.at(shaderID));
+				for (auto& modelEntry : modelEntries) modelEntry.model.drawOpaque(shaders.at(shaderID));
+
+				if (checkError("model, draw")) errorsInLoop = true;
+			}
+		}
+
+		// transparent meshes
+		for (auto& [shaderID, camMap] : meshes) {
+			shaders.at(shaderID).use();
+
+			if (checkError("mesh, shader use")) errorsInLoop = true;
+
+			shaders.at(shaderID).uploadUniforms();
+
+			if (checkError("mesh, shader upload uniforms")) errorsInLoop = true;
+
+			for (auto& [camID, meshEntries] : camMap) {
+				shaders.at(shaderID).uploadMat4("viewProjection", cameras.at(camID).getViewProjection());
+
+				if (checkError("mesh, shader set viewProjection")) errorsInLoop = true;
+
+				for (auto& meshEntry : meshEntries) {
+					if (meshEntry.mesh.isTransparent()) meshEntry.mesh.draw(shaders.at(shaderID));
+				}
+
+				if (checkError("mesh, draw")) errorsInLoop = true;
+			}
+		}
+
+		// transparent model meshes
+		for (auto& [shaderID, camMap] : models) {
+			shaders.at(shaderID).use();
+
+			if (checkError("model, shader use")) errorsInLoop = true;
+
+			shaders.at(shaderID).uploadUniforms();
+
+			if (checkError("model, shader upload uniforms")) errorsInLoop = true;
+
+			for (auto& [camID, modelEntries] : camMap) {
+				shaders.at(shaderID).uploadMat4("viewProjection", cameras.at(camID).getViewProjection());
+
+				if (checkError("model, shader set viewProjection")) errorsInLoop = true;
+
+				for (auto& modelEntry : modelEntries) modelEntry.model.drawTransparent(shaders.at(shaderID));
 
 				if (checkError("model, draw")) errorsInLoop = true;
 			}
