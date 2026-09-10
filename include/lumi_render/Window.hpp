@@ -70,19 +70,23 @@ public:
 	Window(int width = 854, int height = 480, bool fullscreen = false);
 	~Window();
 
-	GLFWwindow *getWindow();
+	GLFWwindow *getWindow() { return window; }
 
 	int getWidth() { return width; }
 	int getHeight() { return height; }
 	float getFps() const { return fps; }
 	bool getFullscreen() { return fullscreen; }
 
-	bool getClearColorBufferActive() { return clearColorBuffer; }
+	bool getClearColorBufferActive() const { return clearColorBuffer; }
 	void setClearColorBufferActive(bool value) { clearColorBuffer = value; }
-	bool getClearDepthBufferActive() { return clearDepthBuffer; }
+
+	bool getClearDepthBufferActive() const { return clearDepthBuffer; }
 	void setClearDepthBufferActive(bool value) { clearDepthBuffer = value; }
-	Vec4 getClearColor() { return clearColor; }
+
+	Vec4 getClearColor() const { return clearColor; }
 	void setClearColor(Vec4 vec) { clearColor = vec; }
+
+	void clearColorBufer() const;
 
 	Shader* getShader(const std::string id);
 	Camera* getCamera(const std::string id);

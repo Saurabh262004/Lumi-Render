@@ -21,15 +21,9 @@ void Window::loop() {
 			GLbitfield clearMask = 0;
 
 			if (clearColorBuffer) clearMask |= GL_COLOR_BUFFER_BIT;
-
 			if (clearDepthBuffer) clearMask |= GL_DEPTH_BUFFER_BIT;
 
-			glClearColor(
-				clearColor.x,
-				clearColor.y,
-				clearColor.z,
-				clearColor.w
-			);
+			clearColorBufer();
 
 			glClear(clearMask);
 		}

@@ -16,6 +16,11 @@ bool Window::checkError(const char* where) {
 	return false;
 }
 
-GLFWwindow *Window::getWindow() {
-	return window;
+void Window::clearColorBufer() const {
+	glClearColor(
+		clearColor.x,
+		clearColor.y,
+		clearColor.z,
+		clearColor.w
+	);
 }
