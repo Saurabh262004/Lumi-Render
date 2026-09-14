@@ -18,6 +18,11 @@ struct InstanceData {
 	Vec4 color;
 };
 
+//struct BoundingSphere {
+//	Vec3 center;
+//	float radius;
+//};
+
 class Mesh {
 public:
 	Mesh(const void* vertexData, std::size_t vertexCount, const VertexLayout& layout);
@@ -56,6 +61,7 @@ private:
 	std::size_t indexCount{0};
 	std::size_t instanceCount{0};
 	std::vector<InstanceData> instanceBuffer;
+	//std::vector<BoundingSphere> instanceBoundingSpheres;
 
 	Vec4 materialColor{1.0f, 1.0f, 1.0f, 1.0f};
 	std::optional<Texture> texture;

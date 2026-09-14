@@ -41,6 +41,11 @@ struct Mat4 {
 		};
 	}
 
+	Mat4& operator*=(const Mat4& o) {
+		*this = *this * o;
+		return *this;
+	}
+
 	static Mat4 translate(const Vec3& t) {
 		Mat4 result = identity();
 

@@ -72,10 +72,11 @@ public:
 
 	GLFWwindow *getWindow() { return window; }
 
-	int getWidth() { return width; }
-	int getHeight() { return height; }
-	float getFps() const { return fps; }
-	bool getFullscreen() { return fullscreen; }
+	int getWidth() const { return width; }
+	int getHeight() const { return height; }
+	float getFPS() const { return fps; }
+	int getAverageFPS(uint32_t milliseconds) const;
+	bool getFullscreen() const { return fullscreen; }
 
 	bool getClearColorBufferActive() const { return clearColorBuffer; }
 	void setClearColorBufferActive(bool value) { clearColorBuffer = value; }
@@ -146,7 +147,11 @@ private:
 	int width{};
 	int height{};
 	bool fullscreen{};
-	float fps{};
+
+	int fps{};
+	std::deque<double> frameTimes;
+	float maxFrameTimeHistory =  2.0f;
+
 	bool active = false;
 
 	bool clearColorBuffer = true;

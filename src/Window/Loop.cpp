@@ -1,3 +1,4 @@
+#include <math.h>
 #include <iostream>
 
 #include <lumi_render/Shader.hpp>
@@ -6,16 +7,25 @@
 void Window::loop() {
 	bool errorsInLoop = false;
 
-	double lastTime = glfwGetTime();
-
 	active = true;
+
+	double lastTime = glfwGetTime();
 	while (active && !glfwWindowShouldClose(window) && !errorsInLoop) {
 		if (lumiPreLoop) lumiPreLoop(this);
 
 		double currentTime = glfwGetTime();
+
 		float deltaTime = static_cast<float>(currentTime - lastTime);
 		fps = 1.0f / deltaTime;
 		lastTime = currentTime;
+
+		frameTimes.push_back(currentTime);
+
+		double cutoff = currentTime - maxFrameTimeHistory;
+
+		while (!frameTimes.empty() && frameTimes.front() < cutoff) {
+			frameTimes.pop_front();
+		}
 
 		if (clearColorBuffer || clearDepthBuffer) {
 			GLbitfield clearMask = 0;

@@ -1,3 +1,4 @@
+#include <math.h>
 #include <iostream>
 
 #include <glad/glad.h>
@@ -23,4 +24,29 @@ void Window::clearColorBufer() const {
 		clearColor.z,
 		clearColor.w
 	);
+}
+
+int Window::getAverageFPS(uint32_t milliseconds) const {
+    if (frameTimes.size() < 2) return 0.0f;
+
+    milliseconds = std::min(milliseconds, 2000u);
+
+    double currentTime = frameTimes.back();
+    double startTime = currentTime - milliseconds / 1000.0;
+
+    auto it = frameTimes.begin();
+
+    while (it != frameTimes.end() && *it < startTime) {
+        ++it;
+    }
+
+    std::size_t frameCount = frameTimes.end() - it;
+
+    if (frameCount < 2) return 0.0f;
+
+    double elapsed = frameTimes.back() - *it;
+
+    if (elapsed <= 0.0) return 0.0f;
+
+    return round((frameCount - 1) / elapsed);
 }
