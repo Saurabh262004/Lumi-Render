@@ -66,7 +66,7 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count, GLenum u
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	instanceCount += count;
+	instanceCount = count;
 }
 
 void Mesh::addNormalInstance() {
