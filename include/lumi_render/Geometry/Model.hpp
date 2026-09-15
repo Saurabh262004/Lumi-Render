@@ -13,30 +13,32 @@ class Model {
 public:
 	explicit Model(const std::string& path, bool normalizeToUnitCube = false);
 
-	float appliedScale() const { return importScale; }
+	std::vector<InstanceData>* getInstanceBuffer() { return &instanceBuffer; }
+	std::vector<Mesh>* getMeshes() { return &meshes; }
+	float getAppliedScale() const { return importScale; }
 
-	void addInstance(const InstanceData& instance) {
-		for (auto& mesh : meshes) mesh.addInstance(instance);
-	}
+	void reserveInstanceSpace(std::size_t count) { instanceBuffer.reserve(count); }
+	
+	void addInstance(const InstanceData& instance) { instanceBuffer.push_back(instance); }
 
-	void reserveInstances(std::size_t count) {
-		for (auto& mesh : meshes) mesh.reserveInstances(count);
-	}
+	void addNormalInstance() { addInstance({ Mat4::identity(), {1, 1, 1, 1} }); }
 
-	void clearInstances() {
-		for (auto& mesh : meshes) mesh.clearInstances();
-	}
-
-	void uploadInstances(GLenum usage = GL_STATIC_DRAW) {
-		for (auto& mesh : meshes) mesh.uploadInstances(usage);
-	}
-
-	void addNormalInstance() {
-		for (auto& mesh : meshes) mesh.addNormalInstance();
-	}
-
+	void clearInstanceBuffer() { instanceBuffer.clear(); }
+	
 	void setInstanceData(const InstanceData* data, std::size_t count, GLenum usage = GL_STATIC_DRAW) {
 		for (auto& mesh : meshes) mesh.setInstanceData(data, count, usage);
+	}
+
+	void updateInstanceData(const InstanceData* data, std::size_t count) {
+		for (auto& mesh : meshes) mesh.updateInstanceData(data, count);
+	}
+
+	void uploadInstanceBuffer(GLenum usage = GL_STATIC_DRAW) {
+		setInstanceData(instanceBuffer.data(), instanceBuffer.size(), usage);
+	}	
+
+	void reUploadInstanceBuffer() {
+		updateInstanceData(instanceBuffer.data(), instanceBuffer.size());
 	}
 
 	void drawOpaque(const Shader& shader) const {
@@ -45,10 +47,6 @@ public:
 
 	void drawTransparent(const Shader& shader) const {
 		for (const auto& mesh : meshes) if (mesh.isTransparent()) mesh.draw(shader);
-	}
-
-	void updateInstanceData(const InstanceData* data, std::size_t count) {
-		for (auto& mesh : meshes) mesh.updateInstanceData(data, count);
 	}
 
 	Model(const Model&) = delete;
@@ -60,6 +58,7 @@ private:
 	std::vector<Mesh> meshes;
 	std::string directory;
 	float importScale{1.0f};
+	std::vector<InstanceData> instanceBuffer;
 
 	Vec4 computeTangent(aiMesh* mesh, unsigned i, const Vec3& normal) const;
 

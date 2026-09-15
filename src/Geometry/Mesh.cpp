@@ -69,16 +69,12 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count, GLenum u
 	instanceCount = count;
 }
 
-void Mesh::addNormalInstance() {
-	InstanceData instance = { Mat4::identity(), {1, 1, 1, 1} };
-
-	addInstance(instance);
-}
-
 void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(InstanceData), data);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	instanceCount = count;
 }
 
 void Mesh::draw(const Shader& shader) const {

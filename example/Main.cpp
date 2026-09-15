@@ -6,6 +6,10 @@
 #include <lumi_render/Geometry/Model.hpp>
 #include <lumi_render/Window.hpp>
 
+struct CustomData {
+	bool firstPass{true};
+};
+
 void keyCallback(Window* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		window->close();
@@ -27,6 +31,18 @@ void fileDropCallback(Window *window, int path_count, const char **paths) {
 	for (int i = 0; i < path_count; i++) {
 		std::cout << "Path " << i << ": " << paths[i] << std::endl;
 	}
+}
+
+void lumiPostLoop(Window* window) {
+	CustomData* customData = static_cast<CustomData*>(window->getUserPointer());
+
+	if (!customData->firstPass) {
+		std::cout << "\033[1A\033[2K";
+	} else {
+		customData->firstPass = false;
+	}
+
+	std::cout << "FPS: " << window->getAverageFPS(500) << std::endl;
 }
 
 Mesh makeTestQuad() {
@@ -78,6 +94,9 @@ Mesh makeTestQuad() {
 int main() {
 	Window window(1280, 720);
 
+	CustomData customData;
+	window.setUserPointer(&customData);
+
 	window.addCamera("3DCam");
 	window.setCameraController("3DCam", std::make_unique<FreeFlyCameraController>(2.0f, 0.002));
 
@@ -100,18 +119,19 @@ int main() {
 	window.addModel("shader1", "3DCam", "model1", "assets/models/pyramid/obj");
 	Model* model1 = window.getModel("shader1", "3DCam", "model1");
 	model1->addInstance({Mat4::translate({0.0f, 1.0f, 0.0f}), {0.7f, 0.0f, 0.5f, 1.0f}});
-	model1->uploadInstances();
+	model1->uploadInstanceBuffer();
 
 	window.addMesh(makeTestQuad(), "shader1", "2DCam", "testQuad");
 	Mesh* testQuad = window.getMesh("shader1", "2DCam", "testQuad");
 	testQuad->setTexture(Texture("assets/textures/checker.png"));
 	testQuad->addInstance({ Mat4::translate({-540.0f, 260.0f, 0.0f}) * Mat4::rotateX(0) * Mat4::scale({200.0f, 200.0f, 1.0f}), {1.0f, 1.0f, 1.0f, 1.0f} });
 	testQuad->setTransparent(true);
-	testQuad->uploadInstances();
+	testQuad->uploadInstanceBuffer();
 
 	window.setKeyCallback(keyCallback);
 	window.setMouseButtonCallback(mouseButtonCallback);
 	window.setDropCallback(fileDropCallback);
+	window.setLumiPostLoop(lumiPostLoop);
 
 	window.loop();
 }

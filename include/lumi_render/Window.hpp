@@ -70,7 +70,10 @@ public:
 	Window(int width = 854, int height = 480, bool fullscreen = false);
 	~Window();
 
-	GLFWwindow *getWindow() { return window; }
+	GLFWwindow *getWindow() const { return window; }
+
+	void setUserPointer(void* ptr) { userPointer = ptr; }
+	void* getUserPointer() const { return userPointer; }
 
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
@@ -141,6 +144,8 @@ public:
 
 private:
 	GLFWwindow *window;
+
+	void* userPointer{nullptr};
 
 	static int windowCount;
 

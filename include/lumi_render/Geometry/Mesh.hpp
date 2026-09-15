@@ -29,14 +29,27 @@ public:
 	Mesh(const void* vertexData, std::size_t vertexCount, const std::uint32_t* indices, std::size_t indexCount, const VertexLayout& layout);
 	~Mesh();
 
+	std::vector<InstanceData>* getInstaceBuffer() { return &instanceBuffer; }
+
+	void reserveInstanceSpace(std::size_t count) { instanceBuffer.reserve(count); }
+	
 	void addInstance(const InstanceData& instance) { instanceBuffer.push_back(instance); }
-	void reserveInstances(std::size_t count) { instanceBuffer.reserve(count); }
-	void clearInstances() { instanceBuffer.clear(); }
-	void uploadInstances(GLenum usage = GL_STATIC_DRAW) { setInstanceData(instanceBuffer.data(), instanceBuffer.size(), usage); }
-	void addNormalInstance();
+
+	void addNormalInstance() { addInstance({ Mat4::identity(), {1, 1, 1, 1} }); }
+
+	void clearInstanceBuffer() { instanceBuffer.clear(); }
 
 	void setInstanceData(const InstanceData* data, std::size_t count, GLenum usage = GL_STATIC_DRAW);
+
 	void updateInstanceData(const InstanceData* data, std::size_t count);
+
+	void uploadInstanceBuffer(GLenum usage = GL_STATIC_DRAW) {
+		setInstanceData(instanceBuffer.data(), instanceBuffer.size(), usage);
+	}
+
+	void reUploadInstanceBuffer() {
+		updateInstanceData(instanceBuffer.data(), instanceBuffer.size());
+	}
 
 	void setMaterialColor(const Vec4& color) { materialColor = color; }
 	void setTexture(Texture&& tex) { texture = std::move(tex); }
