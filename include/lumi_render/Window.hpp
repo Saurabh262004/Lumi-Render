@@ -75,6 +75,13 @@ public:
 	void setUserPointer(void* ptr) { userPointer = ptr; }
 	void* getUserPointer() const { return userPointer; }
 
+	bool getVSync() const { return vSync; }
+
+	void setVSync(bool value) {
+		vSync = value;
+		glfwSwapInterval(value);
+	}
+
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
 	float getFPS() const { return fps; }
@@ -152,6 +159,7 @@ private:
 	int width{};
 	int height{};
 	bool fullscreen{};
+	bool vSync{true};
 
 	int fps{};
 	std::deque<double> frameTimes;

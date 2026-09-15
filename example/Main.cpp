@@ -7,7 +7,7 @@
 #include <lumi_render/Window.hpp>
 
 struct CustomData {
-	bool firstPass{true};
+	int frame{0};
 };
 
 void keyCallback(Window* window, int key, int scancode, int action, int mods) {
@@ -36,11 +36,11 @@ void fileDropCallback(Window *window, int path_count, const char **paths) {
 void lumiPostLoop(Window* window) {
 	CustomData* customData = static_cast<CustomData*>(window->getUserPointer());
 
-	if (!customData->firstPass) {
+	if (customData->frame != 0) {
 		std::cout << "\033[1A\033[2K";
-	} else {
-		customData->firstPass = false;
 	}
+
+	++customData->frame;
 
 	std::cout << "FPS: " << window->getAverageFPS(500) << std::endl;
 }
