@@ -21,3 +21,17 @@ void Window::addShaderFromSource(std::string id, const std::string& vertexSource
 		Shader::fromSource(vertexSource, fragmentSource)
 	);
 }
+
+void Window::addComputeShaderFromFile(std::string id, const std::string& computePath) {
+	shaders.try_emplace(
+		std::move(id),
+		Shader::fromComputeFile(computePath)
+	);
+}
+
+void Window::addComputeShaderFromSource(std::string id, const std::string& computeSource) {
+	shaders.try_emplace(
+		std::move(id),
+		Shader::fromComputeSource(computeSource)
+	);
+}
