@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+#include <array>
 #include <lumi_render/Geometry/Vec.hpp>
 #include <lumi_render/Geometry/Mat.hpp>
 
@@ -133,5 +135,27 @@ public:
 		}
 
 		viewProjection = projection * view;
+	}
+
+	std::array<Vec4, 6> getFrustumPlanes() const {
+		auto row = [&](int r) {
+			return Vec4{
+				viewProjection.m[r],
+				viewProjection.m[r+4],
+				viewProjection.m[r+8],
+				viewProjection.m[r+12]
+			};
+		};
+
+		Vec4 r0 = row(0), r1 = row(1), r2 = row(2), r3 = row(3);
+
+		std::array<Vec4, 6> planes = { r3+r0, r3-r0, r3+r1, r3-r1, r3+r2, r3-r2 };
+
+		for (auto& p : planes) {
+			float len = std::sqrt(p.x*p.x + p.y*p.y + p.z*p.z);
+			p.x/=len; p.y/=len; p.z/=len; p.w/=len;
+		}
+
+		return planes;
 	}
 };
