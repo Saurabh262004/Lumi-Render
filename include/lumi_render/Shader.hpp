@@ -37,6 +37,8 @@ class Shader {
 public:
 	static Shader fromSource(const std::string& vertexSource, const std::string& fragmentSource);
 	static Shader fromFiles(const std::string& vertexPath, const std::string& fragmentPath);
+	static Shader fromComputeSource(const std::string& computeSource);
+	static Shader fromComputeFile(const std::string& computePath);
 
 	void addVec2Uniform(const std::string& id, const Vec2& vec);
 	void addVec3Uniform(const std::string& id, const Vec3& vec);
@@ -96,6 +98,7 @@ public:
 
 private:
 	Shader(const std::string& vertexSource, const std::string& fragmentSource);
+	explicit Shader(const std::string& computeSource);
 
 	GLuint program{};
 

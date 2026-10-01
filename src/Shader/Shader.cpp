@@ -20,6 +20,15 @@ Shader Shader::fromFiles(const std::string& vertexPath, const std::string& fragm
 	return Shader(vertexSource, fragmentSource);
 }
 
+Shader Shader::fromComputeSource(const std::string& computeSource) {
+	return Shader(computeSource);
+}
+
+Shader Shader::fromComputeFile(const std::string& computePath) {
+	std::string computeCode = Util::readFile(computePath);
+	return Shader(computeCode);
+}
+
 Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource) {
 	GLint success;
 
@@ -87,6 +96,49 @@ Shader::Shader(const std::string& vertexSource, const std::string& fragmentSourc
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+}
+
+Shader::Shader(const std::string& computeSource) {
+	GLint success;
+
+	GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
+	const char* srcCStr = computeSource.c_str();
+	glShaderSource(computeShader, 1, &srcCStr, nullptr);
+	glCompileShader(computeShader);
+
+	glGetShaderiv(computeShader, GL_COMPILE_STATUS, &success);
+
+	if (!success) {
+		char infoLog[1024];
+
+		glGetShaderInfoLog(computeShader, 1024, nullptr, infoLog);
+		glDeleteShader(computeShader);
+
+		throw std::runtime_error(
+			std::string("Compute shader compilation failed:\n") + infoLog
+		);
+	}
+
+	program = glCreateProgram();
+	glAttachShader(program, computeShader);
+	glLinkProgram(program);
+
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+
+	if (!success) {
+		char infoLog[1024];
+
+		glGetProgramInfoLog(program, 1024, nullptr, infoLog);
+
+		glDeleteProgram(program);
+		glDeleteShader(computeShader);
+
+		throw std::runtime_error(
+			std::string("Compute program linking failed:\n") + infoLog
+		);
+	}
+
+	glDeleteShader(computeShader);
 }
 
 Shader::~Shader() {
