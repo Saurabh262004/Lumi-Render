@@ -70,7 +70,7 @@ public:
 	void deactivateMat4Uniform(const std::string& id);
 	void deactivateIntUniform(const std::string& id);
 
-	GLuint getProgram();
+	GLuint getProgram() const;
 
 	~Shader();
 

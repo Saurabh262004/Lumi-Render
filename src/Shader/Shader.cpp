@@ -146,7 +146,7 @@ Shader::~Shader() {
 	glDeleteProgram(program);
 }
 
-GLuint Shader::getProgram() { return program; }
+GLuint Shader::getProgram() const { return program; }
 
 void Shader::use() const {
 	glUseProgram(program);
