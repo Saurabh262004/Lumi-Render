@@ -39,6 +39,10 @@ public:
 	static Shader fromFiles(const std::string& vertexPath, const std::string& fragmentPath);
 	static Shader fromComputeSource(const std::string& computeSource);
 	static Shader fromComputeFile(const std::string& computePath);
+	static Shader fromCulledFiles(const std::string& vertexPath, const std::string& fragmentPath);
+	static Shader fromCulledSource(const std::string& vertexSource, const std::string& fragmentSource);
+
+	static std::string injectInstanceCulling(const std::string& vertexSource);
 
 	void addVec2Uniform(const std::string& id, const Vec2& vec);
 	void addVec3Uniform(const std::string& id, const Vec3& vec);
@@ -72,6 +76,22 @@ public:
 
 	GLuint getProgram() const;
 
+	void uploadVec2(const Vec2& vec, const GLint& location) const;
+	void uploadVec3(const Vec3& vec, const GLint& location) const;
+	void uploadVec4(const Vec4& vec, const GLint& location) const;
+	void uploadMat4(const Mat4& mat, const GLint& location) const;
+	void uploadInt(int value, const GLint& location) const;
+	
+	void uploadVec2(const std::string& name, const Vec2& vec) const;
+	void uploadVec3(const std::string& name, const Vec3& vec) const;
+	void uploadVec4(const std::string& name, const Vec4& vec) const;
+	void uploadMat4(const std::string& name, const Mat4& mat) const;
+	void uploadInt(const std::string& name, int value) const;
+	
+	void uploadUniforms();
+	
+	void use() const;
+
 	~Shader();
 
 	Shader(const Shader&) = delete;
@@ -79,22 +99,6 @@ public:
 
 	Shader(Shader&& other) noexcept;
 	Shader& operator=(Shader&& other) noexcept;
-
-	void uploadVec2(const Vec2& vec, const GLint& location) const;
-	void uploadVec3(const Vec3& vec, const GLint& location) const;
-	void uploadVec4(const Vec4& vec, const GLint& location) const;
-	void uploadMat4(const Mat4& mat, const GLint& location) const;
-	void uploadInt(int value, const GLint& location) const;
-
-	void uploadVec2(const std::string& name, const Vec2& vec) const;
-	void uploadVec3(const std::string& name, const Vec3& vec) const;
-	void uploadVec4(const std::string& name, const Vec4& vec) const;
-	void uploadMat4(const std::string& name, const Mat4& mat) const;
-	void uploadInt(const std::string& name, int value) const;
-
-	void uploadUniforms();
-
-	void use() const;
 
 private:
 	Shader(const std::string& vertexSource, const std::string& fragmentSource);

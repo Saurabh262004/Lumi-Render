@@ -35,3 +35,7 @@ void Window::addComputeShaderFromSource(std::string id, const std::string& compu
 		Shader::fromComputeSource(computeSource)
 	);
 }
+
+void Window::addCulledShaderFromFiles(std::string id, const std::string& vertexPath, const std::string& fragmentPath) {
+	shaders.try_emplace(std::move(id), Shader::fromCulledFiles(vertexPath, fragmentPath));
+}
