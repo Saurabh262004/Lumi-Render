@@ -12,16 +12,29 @@ struct aiMaterial;
 class Model {
 public:
 	explicit Model(const std::string& path, bool normalizeToUnitCube = false);
+	~Model();
 
 	std::vector<InstanceData>* getInstanceBuffer() { return &instanceBuffer; }
 	std::vector<Mesh>* getMeshes() { return &meshes; }
 	float getAppliedScale() const { return importScale; }
 
+	GLuint debugReadVisibleCount() const;
+
 	void reserveInstanceSpace(std::size_t count) { instanceBuffer.reserve(count); }
-	
+
+	/**
+	 * injects `localBoundingSphere`
+	 */
+	void addInstance(const Mat4& model, const Vec4& color) {
+		addInstance({ model, color, localBoundingSphere });
+	}
+
+	/**
+	 * does not inject `localBoundingSphere`
+	 */
 	void addInstance(const InstanceData& instance) { instanceBuffer.push_back(instance); }
 
-	void addNormalInstance() { addInstance({ Mat4::identity(), {1, 1, 1, 1} }); }
+	void addNormalInstance() { addInstance(Mat4::identity(), {1, 1, 1, 1}); }
 
 	void clearInstanceBuffer() { instanceBuffer.clear(); }
 	
@@ -49,10 +62,20 @@ public:
 		for (const auto& mesh : meshes) if (mesh.isTransparent()) mesh.draw(shader);
 	}
 
+	Vec4 getLocalBoundingSphere() const { return localBoundingSphere; }
+
+	void ensureCullingBuffers();
+
+	void cullAndDraw(const Shader& cullShader, const Shader& drawShader, const std::array<Vec4,6>& frustumPlanes, const Mat4& viewProj);
+
+	void cullCompute(const Shader& cullShader, const std::array<Vec4,6>& frustumPlanes);
+	void drawCulledOpaque(const Shader& drawShader, const Mat4& viewProj) const;
+	void drawCulledTransparent(const Shader& drawShader, const Mat4& viewProj) const;
+
 	Model(const Model&) = delete;
 	Model& operator=(const Model&) = delete;
-	Model(Model&&) noexcept = default;
-	Model& operator=(Model&&) noexcept = default;
+	Model(Model&& other) noexcept;
+	Model& operator=(Model&& other) noexcept;
 
 private:
 	std::vector<Mesh> meshes;
@@ -74,4 +97,9 @@ private:
 
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+
+	Vec4 localBoundingSphere{};
+	GLuint instanceSSBO{0};
+	GLuint visibleIndexBuffer{0};
+	GLuint drawCommandBuffer{0};
 };

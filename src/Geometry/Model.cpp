@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
+#include <array>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -51,6 +52,24 @@ Model::Model(const std::string& path, bool normalizeToUnitCube) {
 	}
 
 	processNode(scene->mRootNode, scene);
+
+	Vec3 center{0, 0, 0};
+
+	for (const auto& mesh : meshes) {
+		Vec4 s = mesh.getLocalBoundingSphere();
+		center = center + Vec3{s.x, s.y, s.z};
+	}
+
+	center = center * (1.0f / (float)meshes.size());
+
+	float radius = 0.0f;
+
+	for (const auto& mesh : meshes) {
+		Vec4 s = mesh.getLocalBoundingSphere();
+		radius = std::max(radius, (Vec3{s.x, s.y, s.z} - center).length() + s.w);
+	}
+
+	localBoundingSphere = Vec4{center.x, center.y, center.z, radius};
 }
 
 void Model::processNode(aiNode* node, const aiScene* scene) {
@@ -193,4 +212,160 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 	loadMaterial(result, scene, mesh->mMaterialIndex);
 
 	return result;
+}
+
+void Model::ensureCullingBuffers() {
+	if (instanceSSBO == 0) glGenBuffers(1, &instanceSSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, instanceSSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceBuffer.size() * sizeof(InstanceData), instanceBuffer.data(), GL_STATIC_DRAW);
+
+	if (visibleIndexBuffer == 0) glGenBuffers(1, &visibleIndexBuffer);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, visibleIndexBuffer);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceBuffer.size() * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
+	IndirectCmd cmd{0, 0, 0, 0, 0}; // only instanceCount is ever used out of this one
+	if (drawCommandBuffer == 0) glGenBuffers(1, &drawCommandBuffer);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(cmd), &cmd, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+
+	for (auto& mesh : meshes) mesh.ensureIndirectDrawBuffer();
+}
+
+void Model::cullAndDraw(const Shader& cullShader, const Shader& drawShader, const std::array<Vec4,6>& frustumPlanes, const Mat4& viewProj) {
+	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
+
+	GLuint zero = 0;
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &zero);
+
+	cullShader.use();
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, visibleIndexBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, drawCommandBuffer);
+	glUniform4fv(glGetUniformLocation(cullShader.getProgram(), "frustumPlanes"), 6, &frustumPlanes[0].x);
+	glUniform1ui(glGetUniformLocation(cullShader.getProgram(), "totalInstances"), static_cast<GLuint>(instanceBuffer.size()));
+
+	glDispatchCompute((static_cast<GLuint>(instanceBuffer.size()) + 63) / 64, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT | GL_COMMAND_BARRIER_BIT);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, visibleIndexBuffer);
+
+	for (auto& mesh : meshes) {
+		glBindBuffer(GL_COPY_READ_BUFFER, drawCommandBuffer);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, mesh.getDrawCommandBuffer());
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
+			offsetof(IndirectCmd, instanceCount), offsetof(IndirectCmd, instanceCount), sizeof(GLuint));
+
+		mesh.drawIndirect(drawShader, viewProj);
+	}
+}
+
+void Model::cullCompute(const Shader& cullShader, const std::array<Vec4,6>& frustumPlanes) {
+	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
+
+	GLuint zero = 0;
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &zero);
+
+	cullShader.use();
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, visibleIndexBuffer);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, drawCommandBuffer);
+	glUniform4fv(glGetUniformLocation(cullShader.getProgram(), "frustumPlanes"), 6, &frustumPlanes[0].x);
+	glUniform1ui(glGetUniformLocation(cullShader.getProgram(), "totalInstances"), static_cast<GLuint>(instanceBuffer.size()));
+
+	glDispatchCompute((static_cast<GLuint>(instanceBuffer.size()) + 63) / 64, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT | GL_COMMAND_BARRIER_BIT);
+}
+
+void Model::drawCulledOpaque(const Shader& drawShader, const Mat4& viewProj) const {
+	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, visibleIndexBuffer);
+
+	for (const auto& mesh : meshes) {
+		if (mesh.isTransparent()) continue;
+
+		glBindBuffer(GL_COPY_READ_BUFFER, drawCommandBuffer);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, mesh.getDrawCommandBuffer());
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
+			offsetof(IndirectCmd, instanceCount), offsetof(IndirectCmd, instanceCount), sizeof(GLuint));
+
+		mesh.drawIndirect(drawShader, viewProj);
+	}
+}
+
+void Model::drawCulledTransparent(const Shader& drawShader, const Mat4& viewProj) const {
+	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, visibleIndexBuffer);
+
+	for (const auto& mesh : meshes) {
+		if (!mesh.isTransparent()) continue;
+
+		glBindBuffer(GL_COPY_READ_BUFFER, drawCommandBuffer);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, mesh.getDrawCommandBuffer());
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
+			offsetof(IndirectCmd, instanceCount), offsetof(IndirectCmd, instanceCount), sizeof(GLuint));
+
+		mesh.drawIndirect(drawShader, viewProj);
+	}
+}
+
+GLuint Model::debugReadVisibleCount() const {
+	GLuint count = 0;
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
+	glGetBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &count);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+	return count;
+}
+
+Model::~Model() {
+	glDeleteBuffers(1, &instanceSSBO);
+	glDeleteBuffers(1, &visibleIndexBuffer);
+	glDeleteBuffers(1, &drawCommandBuffer);
+}
+
+Model::Model(Model&& other) noexcept :
+	meshes{std::move(other.meshes)},
+	directory{std::move(other.directory)},
+	importScale{other.importScale},
+	instanceBuffer{std::move(other.instanceBuffer)},
+	localBoundingSphere{other.localBoundingSphere},
+	instanceSSBO{other.instanceSSBO},
+	visibleIndexBuffer{other.visibleIndexBuffer},
+	drawCommandBuffer{other.drawCommandBuffer}
+{
+	other.instanceSSBO = 0;
+	other.visibleIndexBuffer = 0;
+	other.drawCommandBuffer = 0;
+}
+
+Model& Model::operator=(Model&& other) noexcept {
+	if (this != &other) {
+		glDeleteBuffers(1, &instanceSSBO);
+		glDeleteBuffers(1, &visibleIndexBuffer);
+		glDeleteBuffers(1, &drawCommandBuffer);
+
+		meshes = std::move(other.meshes);
+		directory = std::move(other.directory);
+		importScale = other.importScale;
+		instanceBuffer = std::move(other.instanceBuffer);
+		localBoundingSphere = other.localBoundingSphere;
+		instanceSSBO = other.instanceSSBO;
+		visibleIndexBuffer = other.visibleIndexBuffer;
+		drawCommandBuffer = other.drawCommandBuffer;
+
+		other.instanceSSBO = 0;
+		other.visibleIndexBuffer = 0;
+		other.drawCommandBuffer = 0;
+	}
+
+	return *this;
 }

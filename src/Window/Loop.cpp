@@ -77,10 +77,27 @@ void Window::loop() {
 				if (checkError("mesh, shader set viewProjection")) errorsInLoop = true;
 
 				for (auto& meshEntry : meshEntries) {
+					if (meshEntry.useCulling) continue;
 					if (!meshEntry.mesh.isTransparent()) meshEntry.mesh.draw(shaders.at(shaderID));
 				}
 
 				if (checkError("mesh, draw")) errorsInLoop = true;
+			}
+		}
+
+		// opaque culled meshes
+		for (auto& [shaderID, camMap] : meshes) {
+			for (auto& [camID, meshEntries] : camMap) {
+				auto frustumPlanes = cameras.at(camID).getFrustumPlanes();
+				Mat4 viewProj = cameras.at(camID).getViewProjection();
+
+				for (auto& meshEntry : meshEntries) {
+					if (!meshEntry.useCulling || meshEntry.mesh.isTransparent()) continue;
+
+					meshEntry.mesh.cullAndDraw(shaders.at("cull"), shaders.at(shaderID), frustumPlanes, viewProj);
+
+					if (checkError("mesh, cullAndDraw opaque")) errorsInLoop = true;
+				}
 			}
 		}
 
@@ -99,9 +116,29 @@ void Window::loop() {
 
 				if (checkError("model, shader set viewProjection")) errorsInLoop = true;
 
-				for (auto& modelEntry : modelEntries) modelEntry.model.drawOpaque(shaders.at(shaderID));
+				for (auto& modelEntry : modelEntries) {
+					if (modelEntry.useCulling) continue;
+					modelEntry.model.drawOpaque(shaders.at(shaderID));
+				}
 
 				if (checkError("model, draw")) errorsInLoop = true;
+			}
+		}
+
+		// opaque culled models
+		for (auto& [shaderID, camMap] : models) {
+			for (auto& [camID, modelEntries] : camMap) {
+				auto frustumPlanes = cameras.at(camID).getFrustumPlanes();
+				Mat4 viewProj = cameras.at(camID).getViewProjection();
+
+				for (auto& modelEntry : modelEntries) {
+					if (!modelEntry.useCulling) continue;
+
+					modelEntry.model.cullCompute(shaders.at("cull"), frustumPlanes);
+					modelEntry.model.drawCulledOpaque(shaders.at(shaderID), viewProj);
+
+					if (checkError("model, cullAndDraw opaque")) errorsInLoop = true;
+				}
 			}
 		}
 
@@ -121,10 +158,27 @@ void Window::loop() {
 				if (checkError("mesh, shader set viewProjection")) errorsInLoop = true;
 
 				for (auto& meshEntry : meshEntries) {
+					if (meshEntry.useCulling) continue;
 					if (meshEntry.mesh.isTransparent()) meshEntry.mesh.draw(shaders.at(shaderID));
 				}
 
 				if (checkError("mesh, draw")) errorsInLoop = true;
+			}
+		}
+
+		// transparent culled meshes
+		for (auto& [shaderID, camMap] : meshes) {
+			for (auto& [camID, meshEntries] : camMap) {
+				auto frustumPlanes = cameras.at(camID).getFrustumPlanes();
+				Mat4 viewProj = cameras.at(camID).getViewProjection();
+
+				for (auto& meshEntry : meshEntries) {
+					if (!meshEntry.useCulling || !meshEntry.mesh.isTransparent()) continue;
+
+					meshEntry.mesh.cullAndDraw(shaders.at("cull"), shaders.at(shaderID), frustumPlanes, viewProj);
+
+					if (checkError("mesh, cullAndDraw transparent")) errorsInLoop = true;
+				}
 			}
 		}
 
@@ -143,9 +197,27 @@ void Window::loop() {
 
 				if (checkError("model, shader set viewProjection")) errorsInLoop = true;
 
-				for (auto& modelEntry : modelEntries) modelEntry.model.drawTransparent(shaders.at(shaderID));
+				for (auto& modelEntry : modelEntries) {
+					if (modelEntry.useCulling) continue;
+					modelEntry.model.drawTransparent(shaders.at(shaderID));
+				}
 
 				if (checkError("model, draw")) errorsInLoop = true;
+			}
+		}
+
+		// transparent culled models
+		for (auto& [shaderID, camMap] : models) {
+			for (auto& [camID, modelEntries] : camMap) {
+				Mat4 viewProj = cameras.at(camID).getViewProjection();
+
+				for (auto& modelEntry : modelEntries) {
+					if (!modelEntry.useCulling) continue;
+
+					modelEntry.model.drawCulledTransparent(shaders.at(shaderID), viewProj);
+
+					if (checkError("model, drawCulledTransparent")) errorsInLoop = true;
+				}
 			}
 		}
 

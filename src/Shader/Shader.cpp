@@ -29,6 +29,16 @@ Shader Shader::fromComputeFile(const std::string& computePath) {
 	return Shader(computeCode);
 }
 
+Shader Shader::fromCulledFiles(const std::string& vertexPath, const std::string& fragmentPath) {
+	std::string vertexSource = Util::readFile(vertexPath);
+	std::string fragmentSource = Util::readFile(fragmentPath);
+	return Shader(injectInstanceCulling(vertexSource), fragmentSource);
+}
+
+Shader Shader::fromCulledSource(const std::string& vertexSource, const std::string& fragmentSource) {
+	return Shader(injectInstanceCulling(vertexSource), fragmentSource);
+}
+
 Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource) {
 	GLint success;
 
@@ -139,6 +149,46 @@ Shader::Shader(const std::string& computeSource) {
 	}
 
 	glDeleteShader(computeShader);
+}
+
+std::string Shader::injectInstanceCulling(const std::string& vertexSource) {
+	std::string src = vertexSource;
+
+	auto stripLine = [&](const std::string& needle) {
+		auto pos = src.find(needle);
+
+		if (pos == std::string::npos) return;
+
+		auto lineStart = src.rfind('\n', pos) + 1;
+		auto lineEnd = src.find('\n', pos);
+
+		lineEnd = (lineEnd == std::string::npos) ? src.size() : lineEnd + 1;
+		src.erase(lineStart, lineEnd - lineStart);
+	};
+
+	stripLine("in mat4 model;");
+	stripLine("in vec4 instanceColor;");
+
+	std::string ssboDecl =
+		"\nstruct InstanceData { mat4 model; vec4 color; vec4 boundingSphere; };\n"
+		"layout(std430, binding = 0) buffer InstanceBuffer { InstanceData instances[]; };\n"
+		"layout(std430, binding = 1) buffer VisibleIndices  { uint visible[]; };\n";
+
+	auto versionEnd = src.find('\n', src.find("#version")) + 1;
+
+	src.insert(versionEnd, ssboDecl);
+
+	std::string fetch =
+		"\n\tuint realIdx = visible[gl_InstanceID];\n"
+		"\tmat4 model = instances[realIdx].model;\n"
+		"\tvec4 instanceColor = instances[realIdx].color;\n";
+
+	auto mainPos = src.find("void main(");
+	auto brace = src.find('{', mainPos);
+
+	src.insert(brace + 1, fetch);
+
+	return src;
 }
 
 Shader::~Shader() {

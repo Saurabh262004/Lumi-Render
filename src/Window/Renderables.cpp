@@ -12,7 +12,7 @@ Mesh* Window::getMesh(const std::string shaderID, const std::string camID, const
 	throw std::runtime_error("getMesh: no mesh registered with id: \"" + meshID + "\" under shaderID: \"" + shaderID + "\" and camID: \"" + camID + "\"");
 }
 
-void Window::addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID) {
+void Window::addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID, bool useCulling) {
 	if (!hasShader(shaderID)) {
 		throw std::runtime_error("addMesh: no shader registered with id \"" + shaderID + "\"");
 	}
@@ -23,7 +23,8 @@ void Window::addMesh(Mesh mesh, std::string shaderID, std::string camID, std::st
 
 	meshes[shaderID][camID].emplace_back(
 		std::move(meshID),
-		std::move(mesh)
+		std::move(mesh),
+		useCulling
 	);
 }
 
@@ -37,17 +38,13 @@ Model* Window::getModel(const std::string shaderID, const std::string camID, con
 	throw std::runtime_error("getMesh: no model registered with id: \"" + modelID + "\" under shaderID: \"" + shaderID + "\" and camID: \"" + camID + "\"");
 }
 
-void Window::addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube) {
-	if (!hasShader(shaderID)) {
-		throw std::runtime_error("addModel: no shader registered with id \"" + shaderID + "\"");
-	}
-
-	if (!hasCamera(camID)) {
-		throw std::runtime_error("addModel: no camera registered with id \"" + camID + "\"");
-	}
+void Window::addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube, bool useCulling) {
+	if (!hasShader(shaderID)) throw std::runtime_error("addModel: no shader registered with id \"" + shaderID + "\"");
+	if (!hasCamera(camID)) throw std::runtime_error("addModel: no camera registered with id \"" + camID + "\"");
 
 	models[shaderID][camID].emplace_back(
 		std::move(modelID),
-		Model(path, normalizeToUnitCube)
+		Model(path, normalizeToUnitCube),
+		useCulling
 	);
 }

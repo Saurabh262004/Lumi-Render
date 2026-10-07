@@ -44,8 +44,9 @@ using LumiLoop               = void(*)(Window* window);                         
 struct MeshEntry {
 	std::string id;
 	Mesh mesh;
+	bool useCulling{false};
 
-	MeshEntry(std::string id, Mesh mesh) : id(std::move(id)), mesh(std::move(mesh)) {}
+	MeshEntry(std::string id, Mesh mesh, bool useCulling = false) : id(std::move(id)), mesh(std::move(mesh)), useCulling(useCulling) {}
 
 	MeshEntry(const MeshEntry&) = delete;
 	MeshEntry& operator=(const MeshEntry&) = delete;
@@ -56,8 +57,9 @@ struct MeshEntry {
 struct ModelEntry {
 	std::string id;
 	Model model;
+	bool useCulling{false};
 
-	ModelEntry(std::string id, Model model) : id(std::move(id)), model(std::move(model)) {}
+	ModelEntry(std::string id, Model model, bool useCulling = false) : id(std::move(id)), model(std::move(model)), useCulling(useCulling) {}
 
 	ModelEntry(const ModelEntry&) = delete;
 	ModelEntry& operator=(const ModelEntry&) = delete;
@@ -115,14 +117,17 @@ public:
 	bool hasShader(const std::string& id) const;
 	void addShaderFromFiles(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
 	void addShaderFromSource(std::string id, const std::string& vertexSource, const std::string& fragmentSource);
+	void addComputeShaderFromFile(std::string id, const std::string& computePath);
+	void addComputeShaderFromSource(std::string id, const std::string& computeSource);
+	void addCulledShaderFromFiles(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
 
 	bool isKeyDown(Key key) const;
 	Vec2 getMouseDelta() const { return mouseDelta; }
 	void setCursorCaptured(bool captured);
 	bool isCursorCaptured() const;
 
-	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID);
-	void addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube = false);
+	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID, bool useCulling = false);
+	void addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube = false, bool useCulling = false);
 
 	// event callback setters
 	void setWindowPosCallback(LumiWindowposfun callback);

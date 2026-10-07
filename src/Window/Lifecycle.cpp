@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <lumi_render/internal/CullShaderSource.hpp>
 #include <lumi_render/Window.hpp>
 
 int Window::windowCount = 0;
@@ -48,6 +49,7 @@ Window::Window(int width, int height, bool fullscreen) : width{width}, height{he
 			if (windowCount == 0) glfwTerminate();
 			throw std::runtime_error("Failed to initialize OpenGL");
 		} else {
+			shaders.try_emplace("cull", Shader::fromComputeSource(lumi_render::internal::cullComputeShaderSource));
 			glfwSetWindowUserPointer(window, this);
 			setInternalCallbacks();
 		}
