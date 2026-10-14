@@ -10,6 +10,7 @@
 #include <assimp/material.h>
 #include <assimp/texture.h>
 
+#include <lumi_render/internal/GLCommands.hpp>
 #include <lumi_render/Geometry/Vec.hpp>
 #include <lumi_render/Geometry/Model.hpp>
 #include <lumi_render/Geometry/Vertex.hpp>
@@ -224,8 +225,7 @@ void Model::ensureCullingBuffers() {
 	glBufferData(GL_SHADER_STORAGE_BUFFER, instanceBuffer.size() * sizeof(GLuint), nullptr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
-	IndirectCmd cmd{0, 0, 0, 0, 0}; // only instanceCount is ever used out of this one
+	lumi_render::internal::IndirectCmd cmd{0, 0, 0, 0, 0}; // only instanceCount is ever used out of this one
 	if (drawCommandBuffer == 0) glGenBuffers(1, &drawCommandBuffer);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
 	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(cmd), &cmd, GL_DYNAMIC_DRAW);
@@ -235,11 +235,9 @@ void Model::ensureCullingBuffers() {
 }
 
 void Model::cullAndDraw(const Shader& cullShader, const Shader& drawShader, const std::array<Vec4,6>& frustumPlanes, const Mat4& viewProj) {
-	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
-
 	GLuint zero = 0;
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
-	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &zero);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint), &zero);
 
 	cullShader.use();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
@@ -258,18 +256,16 @@ void Model::cullAndDraw(const Shader& cullShader, const Shader& drawShader, cons
 		glBindBuffer(GL_COPY_READ_BUFFER, drawCommandBuffer);
 		glBindBuffer(GL_COPY_WRITE_BUFFER, mesh.getDrawCommandBuffer());
 		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-			offsetof(IndirectCmd, instanceCount), offsetof(IndirectCmd, instanceCount), sizeof(GLuint));
+			offsetof(lumi_render::internal::IndirectCmd, instanceCount), offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint));
 
 		mesh.drawIndirect(drawShader, viewProj);
 	}
 }
 
 void Model::cullCompute(const Shader& cullShader, const std::array<Vec4,6>& frustumPlanes) {
-	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
-
 	GLuint zero = 0;
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
-	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &zero);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint), &zero);
 
 	cullShader.use();
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
@@ -283,8 +279,6 @@ void Model::cullCompute(const Shader& cullShader, const std::array<Vec4,6>& frus
 }
 
 void Model::drawCulledOpaque(const Shader& drawShader, const Mat4& viewProj) const {
-	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
-
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, visibleIndexBuffer);
 
@@ -294,15 +288,13 @@ void Model::drawCulledOpaque(const Shader& drawShader, const Mat4& viewProj) con
 		glBindBuffer(GL_COPY_READ_BUFFER, drawCommandBuffer);
 		glBindBuffer(GL_COPY_WRITE_BUFFER, mesh.getDrawCommandBuffer());
 		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-			offsetof(IndirectCmd, instanceCount), offsetof(IndirectCmd, instanceCount), sizeof(GLuint));
+			offsetof(lumi_render::internal::IndirectCmd, instanceCount), offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint));
 
 		mesh.drawIndirect(drawShader, viewProj);
 	}
 }
 
 void Model::drawCulledTransparent(const Shader& drawShader, const Mat4& viewProj) const {
-	struct IndirectCmd { GLuint count, instanceCount, firstIndex, baseVertex, baseInstance; };
-
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, instanceSSBO);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, visibleIndexBuffer);
 
@@ -312,7 +304,7 @@ void Model::drawCulledTransparent(const Shader& drawShader, const Mat4& viewProj
 		glBindBuffer(GL_COPY_READ_BUFFER, drawCommandBuffer);
 		glBindBuffer(GL_COPY_WRITE_BUFFER, mesh.getDrawCommandBuffer());
 		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-			offsetof(IndirectCmd, instanceCount), offsetof(IndirectCmd, instanceCount), sizeof(GLuint));
+			offsetof(lumi_render::internal::IndirectCmd, instanceCount), offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint));
 
 		mesh.drawIndirect(drawShader, viewProj);
 	}
@@ -321,7 +313,7 @@ void Model::drawCulledTransparent(const Shader& drawShader, const Mat4& viewProj
 GLuint Model::debugReadVisibleCount() const {
 	GLuint count = 0;
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
-	glGetBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &count);
+	glGetBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint), &count);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 	return count;
 }

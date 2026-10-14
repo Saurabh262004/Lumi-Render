@@ -8,19 +8,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <lumi_render/internal/GLCommands.hpp>
 #include <lumi_render/Geometry/Vec.hpp>
 #include <lumi_render/Geometry/Mat.hpp>
 #include <lumi_render/Geometry/Vertex.hpp>
 #include <lumi_render/Shader.hpp>
 #include <lumi_render/Texture.hpp>
-
-struct IndirectCmd {
-	GLuint count;
-	GLuint instanceCount;
-	GLuint firstIndex;
-	GLuint baseVertex;
-	GLuint baseInstance;
-};
 
 struct InstanceData {
 	Mat4 model; // position + rotation + scale
@@ -43,7 +36,7 @@ public:
 	void reserveInstanceSpace(std::size_t count) { instanceBuffer.reserve(count); }
 
 	/**
-	 * injects `localBoundingSphere`
+	 * @brief injects `localBoundingSphere`
 	 */
 	void addInstance(const Mat4& model, const Vec4& color) {
 		addInstance({ model, color, localBoundingSphere });
@@ -51,7 +44,7 @@ public:
 	}
 
 	/**
-	 * does not inject `localBoundingSphere`
+	 * @brief does not inject `localBoundingSphere`
      */
 	void addInstance(const InstanceData& instance) { instanceBuffer.push_back(instance); }
 

@@ -61,6 +61,8 @@ void Window::loop() {
 
 		// TEMPORARY FIX
 
+		glDepthMask(GL_TRUE);
+
 		// opaque meshes
 		for (auto& [shaderID, camMap] : meshes) {
 			shaders.at(shaderID).use();
@@ -142,6 +144,8 @@ void Window::loop() {
 			}
 		}
 
+		glDepthMask(GL_FALSE);
+
 		// transparent meshes
 		for (auto& [shaderID, camMap] : meshes) {
 			shaders.at(shaderID).use();
@@ -220,6 +224,8 @@ void Window::loop() {
 				}
 			}
 		}
+
+		glDepthMask(GL_TRUE);
 
 		checkError("Main Loop");
 

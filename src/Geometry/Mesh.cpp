@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <lumi_render/internal/GLCommands.hpp>
 #include <lumi_render/Geometry/Vec.hpp>
 #include <lumi_render/Geometry/Vertex.hpp>
 #include <lumi_render/Geometry/Mesh.hpp>
@@ -109,7 +110,7 @@ void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
 }
 
 void Mesh::ensureIndirectDrawBuffer() {
-	IndirectCmd cmd{ static_cast<GLuint>(indexCount), 0, 0, 0, 0 };
+	lumi_render::internal::IndirectCmd cmd{ static_cast<GLuint>(indexCount), 0, 0, 0, 0 };
 	if (drawCommandBuffer == 0) glGenBuffers(1, &drawCommandBuffer);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
 	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(cmd), &cmd, GL_DYNAMIC_DRAW);
@@ -165,7 +166,7 @@ void Mesh::drawIndirect(const Shader& drawShader, const Mat4& viewProj) const {
 void Mesh::cullAndDraw(const Shader& cullShader, const Shader& drawShader, const std::array<Vec4,6>& frustumPlanes, const Mat4& viewProj) {
 	GLuint zero = 0;
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
-	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &zero);
+	glBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint), &zero);
 
 	cullShader.use();
 	bindInstanceStorageBuffer(0);
@@ -185,7 +186,7 @@ void Mesh::cullAndDraw(const Shader& cullShader, const Shader& drawShader, const
 GLuint Mesh::debugReadVisibleCount() const {
 	GLuint count = 0;
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawCommandBuffer);
-	glGetBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(IndirectCmd, instanceCount), sizeof(GLuint), &count);
+	glGetBufferSubData(GL_DRAW_INDIRECT_BUFFER, offsetof(lumi_render::internal::IndirectCmd, instanceCount), sizeof(GLuint), &count);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 	return count;
 }

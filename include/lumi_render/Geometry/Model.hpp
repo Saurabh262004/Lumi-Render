@@ -23,21 +23,21 @@ public:
 	void reserveInstanceSpace(std::size_t count) { instanceBuffer.reserve(count); }
 
 	/**
-	 * injects `localBoundingSphere`
+	 * @brief injects `localBoundingSphere`
 	 */
 	void addInstance(const Mat4& model, const Vec4& color) {
 		addInstance({ model, color, localBoundingSphere });
 	}
 
 	/**
-	 * does not inject `localBoundingSphere`
+	 * @brief does not inject `localBoundingSphere`
 	 */
 	void addInstance(const InstanceData& instance) { instanceBuffer.push_back(instance); }
 
 	void addNormalInstance() { addInstance(Mat4::identity(), {1, 1, 1, 1}); }
 
 	void clearInstanceBuffer() { instanceBuffer.clear(); }
-	
+
 	void setInstanceData(const InstanceData* data, std::size_t count, GLenum usage = GL_STATIC_DRAW) {
 		for (auto& mesh : meshes) mesh.setInstanceData(data, count, usage);
 	}
